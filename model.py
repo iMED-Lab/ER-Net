@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # @Author : hao zhang
-# @File   : ER-Net.py
+# @File   : model.py
 import torch
 import torch.nn as nn
 from functools import partial
