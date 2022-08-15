@@ -1,2 +1,1 @@
-# 3D Vessel-like Structure Segmentation in Medical Images by Edge-Reinforced  Network.
-The code will be released soon.
+# 3D Vessel-like Structure Segmentation in Medical Images by an Edge-Reinforced Network.
