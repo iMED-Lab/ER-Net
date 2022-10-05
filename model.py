@@ -79,6 +79,29 @@ class SFConv(nn.Module):
                 nn.Linear(d, features)
             )
         self.softmax = nn.Softmax(dim=1)
+    def forward(self, x1, x2):
+        # for i, conv in enumerate(self.convs):
+        #     fea = conv(x).unsqueeze_(dim=1)
+        #     if i == 0:
+        #         feas = fea
+        #     else:
+        #         feas = torch.cat([feas, fea], dim=1)
+        feas = torch.cat((x1.unsqueeze_(dim=1), x2.unsqueeze_(dim=1)), dim=1)
+        fea_U = torch.sum(feas, dim=1)
+        # fea_s = self.gap(fea_U).squeeze_()
+        fea_s = fea_U.mean(-1).mean(-1).mean((-1))
+        fea_z = self.fc(fea_s)
+        for i, fc in enumerate(self.fcs):
+            vector = fc(fea_z).unsqueeze_(dim=1)
+            if i == 0:
+                attention_vectors = vector
+            else:
+                attention_vectors = torch.cat([attention_vectors, vector], dim=1)
+        attention_vectors = self.softmax(attention_vectors)
+        attention_vectors = attention_vectors.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
+        fea_v = (feas * attention_vectors).sum(dim=1)
+        return fea_v
+        
 
 
 class SF_Decoder(nn.Module):
