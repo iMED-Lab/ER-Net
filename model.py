@@ -12,12 +12,13 @@ import torch.nn.functional as F
 nonlinearity = partial(F.relu, inplace=True)
 
 
-
-
 def downsample():
     return nn.MaxPool3d(kernel_size=2, stride=2)
+
+
 def deconv(in_channels, out_channels):
     return nn.ConvTranspose3d(in_channels, out_channels, kernel_size=2, stride=2)
+
 
 def initialize_weights(*models):
     for model in models:
@@ -32,6 +33,7 @@ def initialize_weights(*models):
 
 
 class ResDecoder(nn.Module):
+
     def __init__(self, in_channels):
         super(ResDecoder, self).__init__()
         self.conv1 = nn.Conv3d(in_channels, in_channels, kernel_size=3, padding=1)
@@ -45,10 +47,13 @@ class ResDecoder(nn.Module):
         residual = self.conv1x1(x)
         out = self.relu(self.bn1(self.conv1(x)))
         out = self.relu(self.bn2(self.conv2(out)))
-        out += residual
+        out = out + residual
         out = self.relu(out)
         return out
+
+
 class SFConv(nn.Module):
+
     def __init__(self, features, M=2, r=4, L=32):
         """ Constructor
         Args:
@@ -75,10 +80,9 @@ class SFConv(nn.Module):
         self.fc = nn.Linear(features, d)
         self.fcs = nn.ModuleList([])
         for i in range(M):
-            self.fcs.append(
-                nn.Linear(d, features)
-            )
+            self.fcs.append(nn.Linear(d, features))
         self.softmax = nn.Softmax(dim=1)
+
     def forward(self, x1, x2):
         # for i, conv in enumerate(self.convs):
         #     fea = conv(x).unsqueeze_(dim=1)
@@ -101,10 +105,10 @@ class SFConv(nn.Module):
         attention_vectors = attention_vectors.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
         fea_v = (feas * attention_vectors).sum(dim=1)
         return fea_v
-        
 
 
 class SF_Decoder(nn.Module):
+
     def __init__(self, out_channels):
         super(SF_Decoder, self).__init__()
         self.conv1 = SFConv(out_channels)
@@ -125,7 +129,9 @@ class SF_Decoder(nn.Module):
         # out = self.relu(out)
         return out
 
+
 class ResEncoder(nn.Module):
+
     def __init__(self, in_channels, out_channels):
         super(ResEncoder, self).__init__()
         self.conv1 = nn.Conv3d(in_channels, out_channels, kernel_size=3, padding=1)
@@ -139,10 +145,13 @@ class ResEncoder(nn.Module):
         residual = self.conv1x1(x)
         out = self.relu(self.bn1(self.conv1(x)))
         out = self.relu(self.bn2(self.conv2(out)))
-        out += residual
+        out = out + residual
         out = self.relu(out)
         return out
+
+
 class ER_Net(nn.Module):
+
     def __init__(self, classes, channels):
         # def __init__(self):
 
